@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Display information about DNS subdomains
+
+domain=$1
+subdomain=$2
+
+check_subdomain() {
+    result=$(dig "$1.$domain" +noall +answer | awk '$4 == "A" {print $4, $5; exit}')
+
+    record_type=$(echo "$result" | awk '{print $1}')
+    destination=$(echo "$result" | awk '{print $2}')
+
+    echo "The subdomain $1 is a $record_type record and points to $destination"
+}
+
+if [ -n "$subdomain" ]; then
+    check_subdomain "$subdomain"
+else
+    check_subdomain "www"
+    check_subdomain "lb-01"
+    check_subdomain "web-01"
+    check_subdomain "web-02"
+fi
